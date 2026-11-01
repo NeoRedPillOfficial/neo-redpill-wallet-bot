@@ -1,0 +1,14 @@
+.env
+*.db
+*.db-wal
+*.db-shm
+*.nrpb
+backups/
+price_history.json
+flamingo_routes.json
+usage.json
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+update_*.py
