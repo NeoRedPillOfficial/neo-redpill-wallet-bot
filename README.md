@@ -46,8 +46,8 @@ Live bot: [@NeoRedPillWalletBot](https://t.me/NeoRedPillWalletBot)
 Requires Python 3.12 or newer.
 
 ```bash
-git clone https://github.com/<your-account>/<this-repo>.git
-cd <this-repo>
+git clone https://github.com/asifuddoulanoyon/neo-redpill-wallet-bot.git
+cd neo-redpill-wallet-bot
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env                                   # then edit .env
