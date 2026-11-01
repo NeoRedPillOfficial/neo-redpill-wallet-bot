@@ -1,0 +1,95 @@
+NEO RED PILL WALLET BOT - RECOVERY GUIDE
+=========================================
+Use this if the server is lost, or you want to move the bot to a new server.
+
+WHAT YOU NEED (keep these safe, NOT only on the server)
+  1. The bot code: EITHER the newest "BOT-CODE_....zip" the bot sends to Aziz and
+     @btc_mahadi automatically once a day and whenever the bot is updated (no passwords inside),
+     OR the newest update_*.py file from Claude. Both contain the whole bot.
+  2. Your .env file (has the MASTER_KEY, bot token, BACKUP_PASSWORD, RPC addresses).
+     If you only have the pieces: MASTER_KEY, bot token, BACKUP_PASSWORD - that is enough,
+     the rest can be set again.
+  3. The BACKUP PASSWORD (write it on paper).
+  4. The newest data backup file (sent every hour), named like USER-DATA-BACKUP_2026-10-24_1200.nrpb
+     (Aziz and @btc_mahadi receive one every hour in the bot chat. Download the newest.)
+
+NEVER send the MASTER_KEY or .env by Telegram or email. Keep them on paper / a USB drive.
+Without the MASTER_KEY, the backup cannot give access to any wallet.
+
+-----------------------------------------------------------------
+STEP 1 - Prepare the new server (Windows)
+-----------------------------------------------------------------
+Install Python 3.12 from python.org (tick "Add Python to PATH").
+Open PowerShell and run:
+
+  mkdir C:\walletbot
+  mkdir C:\walletbot\bot
+  New-Item C:\walletbot\bot\main.py -ItemType File
+  cd C:\walletbot
+
+Copy these into C:\walletbot :  the code (zip or update file), and the backup file (.nrpb)
+
+-----------------------------------------------------------------
+STEP 2 - Install the bot code
+-----------------------------------------------------------------
+  cd C:\walletbot
+  If you have the code ZIP (BOT-CODE_....zip):
+    Expand-Archive BOT-CODE_XXXX.zip C:\walletbot -Force
+  If you have an update file instead:
+    python update_backup6.py        (use your file's real name)
+  Then:
+  python -m venv .venv
+  .\.venv\Scripts\python -m pip install -r requirements.txt
+
+-----------------------------------------------------------------
+STEP 3 - Put your settings back
+-----------------------------------------------------------------
+  notepad C:\walletbot\.env
+
+Paste your old .env content. If you lost the file, write at least:
+
+  BOT_TOKEN=your bot token from BotFather
+  MASTER_KEY=your master key (EXACTLY the same as before)
+  BACKUP_PASSWORD=your backup password
+  (and your RPC lines, e.g. BSC_RPC=..., if you had them)
+
+Check .env.example in the folder to see the names of all settings.
+The MASTER_KEY must be identical to the old one, or wallets cannot be opened.
+
+-----------------------------------------------------------------
+STEP 4 - Restore the data
+-----------------------------------------------------------------
+Use the exact file name of your newest backup:
+
+  cd C:\walletbot
+  .\.venv\Scripts\python -m bot.backup restore USER-DATA-BACKUP_2026-10-24_1200.nrpb
+
+It asks for the backup password (typing is hidden, that is normal), then creates
+walletbot-restored.db. Then:
+
+  Rename-Item walletbot-restored.db walletbot.db
+
+(If a walletbot.db already exists, delete it first - it is empty/new.)
+
+-----------------------------------------------------------------
+STEP 5 - Start the bot
+-----------------------------------------------------------------
+Test first:
+  .\.venv\Scripts\python -m bot.main
+Send /start to the bot. Check your wallet balance shows. Stop with Ctrl+C.
+
+To run it all the time (starts after reboot):
+  $a = New-ScheduledTaskAction -Execute "C:\walletbot\.venv\Scripts\python.exe" -Argument "-m bot.main" -WorkingDirectory "C:\walletbot"
+  $t = New-ScheduledTaskTrigger -AtStartup
+  Register-ScheduledTask -TaskName WalletBot -Action $a -Trigger $t -RunLevel Highest
+  Start-ScheduledTask -TaskName WalletBot
+
+-----------------------------------------------------------------
+IMPORTANT NOTES
+-----------------------------------------------------------------
+* Run only ONE copy of the bot at a time with the same bot token. If the old
+  server is still on, turn it off first.
+* Not restored (small things): custom logos set with /setlogo, price-chart
+  history, a rain/quiz that was running at that moment.
+* After recovery, backups start again every hour automatically.
+* If a step shows an error, copy the red text and send it to Claude for help.
